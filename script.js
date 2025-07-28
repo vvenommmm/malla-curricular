@@ -1,5 +1,5 @@
-// Lista completa de ramos y requisitos con orden por año y semestre
-const ramos = [
+document.addEventListener("DOMContentLoaded", () => {
+  const ramos = [
   // Primer Año
   { id: "anat_humana", nombre: "Anatomía humana normal y embriología", requisitos: [], anio: 1, semestre: 1 },
   { id: "biol_celular", nombre: "Biología celular", requisitos: [], anio: 1, semestre: 1 },
@@ -66,3 +66,58 @@ const ramos = [
   { id: "internado", nombre: "Internado clínico", requisitos: ["cirugia_trauma", "cirugia_adulto", "odontopediatria", "ortodoncia", "investigacion", "medicina_legal", "resp_social"], anio: 6, semestre: 0 },
   { id: "proyecto", nombre: "Proyecto integrado de investigación", requisitos: ["cirugia_trauma", "cirugia_adulto", "odontopediatria", "ortodoncia", "investigacion", "medicina_legal", "resp_social"], anio: 6, semestre: 0 },
 ];
+ const aprobados = new Set(JSON.parse(localStorage.getItem("ramosAprobados") || "[]"));
+
+  function guardarEstado() {
+    localStorage.setItem("ramosAprobados", JSON.stringify(Array.from(aprobados)));
+  }
+
+  function crearRamo(ramo) {
+    const div = document.createElement("div");
+    div.className = "ramo";
+    div.id = ramo.id;
+    div.textContent = ramo.nombre;
+
+    const estado = document.createElement("span");
+    estado.className = "estado";
+    div.appendChild(estado);
+
+    div.addEventListener("click", () => {
+      if (!div.classList.contains("bloqueado")) {
+        if (aprobados.has(ramo.id)) {
+          aprobados.delete(ramo.id);
+        } else {
+          aprobados.add(ramo.id);
+        }
+        guardarEstado();
+        render();
+      }
+    });
+    return div;
+  }
+
+  function render() {
+    const contenedor = document.getElementById("malla");
+    contenedor.innerHTML = "";
+
+    ramos.sort((a, b) => (a.año - b.año) || (a.semestre - b.semestre)).forEach((ramo) => {
+      const div = crearRamo(ramo);
+      const requisitosCumplidos = ramo.requisitos.every((req) => aprobados.has(req));
+      const estado = div.querySelector(".estado");
+
+      if (aprobados.has(ramo.id)) {
+        div.classList.add("aprobado");
+        estado.textContent = "Aprobado";
+      } else if (!requisitosCumplidos) {
+        div.classList.add("bloqueado");
+        estado.textContent = "Bloqueado";
+      } else {
+        estado.textContent = "Disponible";
+      }
+
+      contenedor.appendChild(div);
+    });
+  }
+
+  render();
+});
