@@ -1,3 +1,4 @@
+body {
   font-family: 'Segoe UI', sans-serif;
   background-color: #fff0f5;
   color: #333;
@@ -5,25 +6,10 @@
   padding: 1rem;
   text-align: center;
 }
+h1 { color: #d63384; margin-bottom: 1rem; }
+h2 { font-size: 1.2rem; color: #a61e4d; margin-top: .5rem; }
+h3 { font-size: 1rem; color: #861e3f; margin: .3rem 0; }
 
-h1 {
-  color: #d63384;
-  margin-bottom: 1rem;
-}
-
-h2 {
-  font-size: 1.2rem;
-  margin-top: 0;
-  color: #a61e4d;
-}
-
-h3 {
-  font-size: 1rem;
-  margin: 0.5rem 0;
-  color: #861e3f;
-}
-
-/* Contenedor principal en columnas por año */
 .grid-malla {
   display: flex;
   gap: 1.5rem;
@@ -37,7 +23,7 @@ h3 {
   border-radius: 12px;
   padding: 1rem;
   width: 220px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .bloque-semestre {
@@ -53,7 +39,7 @@ h3 {
   border: 1px solid #f8a5c2;
   border-radius: 8px;
   margin: 0.3rem 0;
-  padding: 0.4rem 0.6rem;
+  padding: 0.4rem;
   cursor: pointer;
   transition: transform 0.1s ease;
   font-size: 0.9rem;
