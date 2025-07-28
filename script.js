@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "proyecto", nombre: "Proyecto integrado de investigación", requisitos: ["cirugia_maxilofacial", "cirugia_integral", "odontopediatria", "ortodoncia", "investigacion", "legal", "social"], año: 6, semestre: 0 },
   ];
 
-  const aprobados = new Set(JSON.parse(localStorage.getItem("ramosAprobados") || "[]"));
+   const aprobados = new Set(JSON.parse(localStorage.getItem("ramosAprobados") || "[]"));
 
   function guardarEstado() {
     localStorage.setItem("ramosAprobados", JSON.stringify(Array.from(aprobados)));
@@ -100,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function render() {
     const contenedor = document.getElementById("malla");
     contenedor.innerHTML = "";
+    contenedor.classList.add("grid-malla");
 
     const años = [...new Set(ramos.map((r) => r.año))].sort((a, b) => a - b);
 
@@ -111,53 +112,37 @@ document.addEventListener("DOMContentLoaded", () => {
       titulo.textContent = `Año ${año}`;
       columna.appendChild(titulo);
 
-      const anual = document.createElement("div");
-      anual.className = "fila-semestre";
-      const s1 = document.createElement("div");
-      s1.className = "fila-semestre";
-      const s2 = document.createElement("div");
-      s2.className = "fila-semestre";
+      const semestres = [1, 2];
+      semestres.forEach((semestre) => {
+        const bloque = document.createElement("div");
+        bloque.className = "bloque-semestre";
 
-      ramos
-        .filter((r) => r.año === año)
-        .forEach((ramo) => {
-          const div = crearRamo(ramo);
-          const requisitosCumplidos = ramo.requisitos.every((req) => aprobados.has(req));
-          const estado = div.querySelector(".estado");
-
-          if (aprobados.has(ramo.id)) {
-            div.classList.add("aprobado");
-            estado.textContent = "Aprobado";
-          } else if (!requisitosCumplidos) {
-            div.classList.add("bloqueado");
-            estado.textContent = "Bloqueado";
-          } else {
-            estado.textContent = "Disponible";
-          }
-
-          if (ramo.semestre === 1) s1.appendChild(div);
-          else if (ramo.semestre === 2) s2.appendChild(div);
-          else anual.appendChild(div);
-        });
-
-      if (anual.childNodes.length > 0) {
         const label = document.createElement("h3");
-        label.textContent = "Anual";
-        columna.appendChild(label);
-        columna.appendChild(anual);
-      }
-      if (s1.childNodes.length > 0) {
-        const label = document.createElement("h3");
-        label.textContent = "Semestre 1";
-        columna.appendChild(label);
-        columna.appendChild(s1);
-      }
-      if (s2.childNodes.length > 0) {
-        const label = document.createElement("h3");
-        label.textContent = "Semestre 2";
-        columna.appendChild(label);
-        columna.appendChild(s2);
-      }
+        label.textContent = `Semestre ${semestre}`;
+        bloque.appendChild(label);
+
+        ramos
+          .filter((r) => r.año === año && r.semestre === semestre)
+          .forEach((ramo) => {
+            const div = crearRamo(ramo);
+            const requisitosCumplidos = ramo.requisitos.every((req) => aprobados.has(req));
+            const estado = div.querySelector(".estado");
+
+            if (aprobados.has(ramo.id)) {
+              div.classList.add("aprobado");
+              estado.textContent = "Aprobado";
+            } else if (!requisitosCumplidos) {
+              div.classList.add("bloqueado");
+              estado.textContent = "Bloqueado";
+            } else {
+              estado.textContent = "Disponible";
+            }
+
+            bloque.appendChild(div);
+          });
+
+        columna.appendChild(bloque);
+      });
 
       contenedor.appendChild(columna);
     });
@@ -165,4 +150,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   render();
 });
-
