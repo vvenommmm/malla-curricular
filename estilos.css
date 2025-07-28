@@ -1,105 +1,79 @@
-body {
-  background-color: #ffe4f0; /* rosa pastel */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 20px;
-  color: #5a2a4d;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff0f5;
+  color: #333;
+  margin: 0;
+  padding: 1rem;
   text-align: center;
 }
 
 h1 {
-  margin-bottom: 5px;
+  color: #d63384;
+  margin-bottom: 1rem;
 }
 
-p {
+h2 {
+  font-size: 1.2rem;
   margin-top: 0;
-  margin-bottom: 20px;
-  font-weight: 600;
-  color: #7a3f67;
+  color: #a61e4d;
 }
 
-#malla-container {
-  overflow-x: auto;
-  max-width: 100%;
+h3 {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  color: #861e3f;
 }
 
-#malla {
-  border-collapse: collapse;
-  width: 100%;
-  min-width: 900px;
-  table-layout: fixed;
+/* Contenedor principal en columnas por año */
+.grid-malla {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
-#malla th, #malla td {
-  border: 2px solid #e18ab8;
-  padding: 10px;
-  vertical-align: top;
-  width: 140px;
-  max-width: 140px;
-  word-wrap: break-word;
-  color: #4b1f38;
-  font-weight: 700;
-  background-color: #f8cddf;
-  cursor: pointer;
+.columna-ano {
+  background: #ffe6f0;
+  border-radius: 12px;
+  padding: 1rem;
+  width: 220px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bloque-semestre {
+  margin-top: 1rem;
+  background-color: #fff;
   border-radius: 8px;
-  position: relative;
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-#malla th {
-  background-color: #f9bfd3;
-  color: #7a3f67;
-  cursor: default;
-  font-size: 1.1rem;
-}
-
-#titulo-semestres {
-  background-color: transparent;
-  border: none;
-  font-weight: 600;
-  color: #a64f8f;
-  cursor: default;
-  text-align: left;
-  padding-left: 20px;
-  width: 90px;
+  padding: 0.5rem;
+  border: 1px solid #f8a5c2;
 }
 
 .ramo {
-  background-color: #f8cddf;
-  border: none;
-  padding: 6px;
-  border-radius: 6px;
+  background: #fddde6;
+  border: 1px solid #f8a5c2;
+  border-radius: 8px;
+  margin: 0.3rem 0;
+  padding: 0.4rem 0.6rem;
   cursor: pointer;
-  box-shadow: 1px 1px 6px rgba(229, 156, 185, 0.6);
-  user-select: none;
-  font-weight: 700;
-  color: #4b1f38;
-  transition: background-color 0.3s, box-shadow 0.3s;
-  margin-bottom: 6px;
-}
-
-.ramo:hover:not(.bloqueado) {
-  background-color: #f9bfd3;
-  box-shadow: 0 0 8px #d04f88;
-}
-
-.ramo.bloqueado {
-  background-color: #f0d9e3;
-  color: #a6768e;
-  cursor: not-allowed;
-  box-shadow: none;
-  opacity: 0.7;
+  transition: transform 0.1s ease;
+  font-size: 0.9rem;
+  text-align: left;
 }
 
 .ramo.aprobado {
-  background-color: #d87cae;
-  color: #fff;
-  box-shadow: 0 0 10px #d87cae;
+  background: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.ramo.bloqueado {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .estado {
-  font-size: 0.7rem;
-  font-style: italic;
-  opacity: 0.8;
-  margin-left: 4px;
+  display: block;
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.2rem;
 }
-
