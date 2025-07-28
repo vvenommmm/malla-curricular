@@ -74,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "proyecto", nombre: "Proyecto integrado de investigación", requisitos: ["cirugia_trauma", "cirugia_adulto", "odontopediatria", "ortodoncia", "investigacion", "medicina_legal", "resp_social"], año: 6, semestre: 0 },
   ];
 
-  // Carga los aprobados guardados en localStorage (si hay)
   const aprobados = new Set(JSON.parse(localStorage.getItem("ramosAprobados") || "[]"));
 
   function guardarEstado() {
@@ -109,25 +108,55 @@ document.addEventListener("DOMContentLoaded", () => {
     const contenedor = document.getElementById("malla");
     contenedor.innerHTML = "";
 
-    // Ordena por año y semestre
-    ramos.sort((a, b) => (a.año - b.año) || (a.semestre - b.semestre)).forEach((ramo) => {
-      const div = crearRamo(ramo);
-      const requisitosCumplidos = ramo.requisitos.every((req) => aprobados.has(req));
-      const estado = div.querySelector(".estado");
+    // Agrupar por año
+    const años = [...new Set(ramos.map(r => r.año))].sort((a,b) => a-b);
 
-      if (aprobados.has(ramo.id)) {
-        div.classList.add("aprobado");
-        estado.textContent = "Aprobado";
-      } else if (!requisitosCumplidos) {
-        div.classList.add("bloqueado");
-        estado.textContent = "Bloqueado";
-      } else {
-        estado.textContent = "Disponible";
-      }
+    años.forEach(año => {
+      const contAño = document.createElement("div");
+      contAño.className = "año-container";
 
-      contenedor.appendChild(div);
+      const tituloAño = document.createElement("h2");
+      tituloAño.textContent = `Año ${año}`;
+      contAño.appendChild(tituloAño);
+
+      // Semestres de ese año
+      const semestres = [...new Set(ramos.filter(r => r.año === año).map(r => r.semestre))].sort((a,b) => a-b);
+
+      semestres.forEach(sem => {
+        const contSemestre = document.createElement("div");
+        contSemestre.className = "semestre-container";
+
+        const tituloSem = document.createElement("h3");
+        tituloSem.textContent = sem === 0 ? "Anual" : `Semestre ${sem}`;
+        contSemestre.appendChild(tituloSem);
+
+        // Ramos del semestre
+        const ramosSem = ramos.filter(r => r.año === año && r.semestre === sem);
+        ramosSem.forEach(ramo => {
+          const div = crearRamo(ramo);
+          const requisitosCumplidos = ramo.requisitos.every(req => aprobados.has(req));
+          const estado = div.querySelector(".estado");
+
+          if (aprobados.has(ramo.id)) {
+            div.classList.add("aprobado");
+            estado.textContent = "Aprobado";
+          } else if (!requisitosCumplidos) {
+            div.classList.add("bloqueado");
+            estado.textContent = "Bloqueado";
+          } else {
+            estado.textContent = "Disponible";
+          }
+
+          contSemestre.appendChild(div);
+        });
+
+        contAño.appendChild(contSemestre);
+      });
+
+      contenedor.appendChild(contAño);
     });
   }
 
   render();
 });
+
