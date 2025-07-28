@@ -73,106 +73,101 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "internado", nombre: "Internado clínico", requisitos: ["cirugia_trauma", "cirugia_adulto", "odontopediatria", "ortodoncia", "investigacion", "medicina_legal", "resp_social"], año: 6, semestre: 0 },
     { id: "proyecto", nombre: "Proyecto integrado de investigación", requisitos: ["cirugia_trauma", "cirugia_adulto", "odontopediatria", "ortodoncia", "investigacion", "medicina_legal", "resp_social"], año: 6, semestre: 0 },
   ];
-
-  // Guardar/leer aprobados de localStorage
-  const aprobados = new Set(JSON.parse(localStorage.getItem("ramosAprobados") || "[]"));
+ const aprobados = new Set(JSON.parse(localStorage.getItem("ramosAprobados") || "[]"));
 
   function guardarEstado() {
     localStorage.setItem("ramosAprobados", JSON.stringify(Array.from(aprobados)));
   }
 
-  // Obtener años y semestres presentes
-  const años = [...new Set(ramos.map(r => r.año))].sort((a,b) => a - b);
+  function crearRamo(ramo) {
+    const div = document.createElement("div");
+    div.className = "ramo";
+    div.id = ramo.id;
+    div.textContent = ramo.nombre;
 
-  // Para la tabla, vamos a ordenar semestres (incluyendo 0 como "Anual")
-  const semestresRaw = [...new Set(ramos.map(r => r.semestre))];
-  // Queremos semestres ordenados y con 0 al inicio:
-  const semestres = semestresRaw.filter(s => s !== 0).sort((a,b) => a-b);
-  if(semestresRaw.includes(0)) semestres.unshift(0);
+    const estado = document.createElement("span");
+    estado.className = "estado";
+    div.appendChild(estado);
 
-  // Crear celda con ramos (pueden ser varios por celda)
-  function crearCelda(año, semestre) {
-    const celda = document.createElement("td");
-    const ramosEnCelda = ramos.filter(r => r.año === año && r.semestre === semestre);
-
-    if(ramosEnCelda.length === 0) {
-      celda.textContent = "-";
-      celda.style.color = "#a6768e";
-      celda.style.fontStyle = "italic";
-      celda.style.cursor = "default";
-      return celda;
-    }
-
-    ramosEnCelda.forEach(ramo => {
-      const div = document.createElement("div");
-      div.className = "ramo";
-      div.textContent = ramo.nombre;
-      div.id = ramo.id;
-
-      const requisitosCumplidos = ramo.requisitos.every(req => aprobados.has(req));
-
-      if (aprobados.has(ramo.id)) {
-        div.classList.add("aprobado");
-        div.title = "Aprobado (clic para desaprobar)";
-      } else if (!requisitosCumplidos) {
-        div.classList.add("bloqueado");
-        div.title = "Bloqueado: no cumple requisitos";
-      } else {
-        div.title = "Disponible (clic para aprobar)";
-      }
-
-      div.addEventListener("click", () => {
-        if (!div.classList.contains("bloqueado")) {
-          if (aprobados.has(ramo.id)) {
-            aprobados.delete(ramo.id);
-          } else {
-            aprobados.add(ramo.id);
-          }
-          guardarEstado();
-          render();
+    div.addEventListener("click", () => {
+      if (!div.classList.contains("bloqueado")) {
+        if (aprobados.has(ramo.id)) {
+          aprobados.delete(ramo.id);
+        } else {
+          aprobados.add(ramo.id);
         }
-      });
-
-      celda.appendChild(div);
+        guardarEstado();
+        render();
+      }
     });
-
-    return celda;
+    return div;
   }
 
   function render() {
-    const tabla = document.getElementById("malla");
-    tabla.innerHTML = "";
+    const contenedor = document.getElementById("malla");
+    contenedor.innerHTML = "";
 
-    // Primera fila: cabecera años (con primera celda vacía para semestres)
-    const trHead = document.createElement("tr");
-    const thVacio = document.createElement("th");
-    thVacio.id = "titulo-semestres";
-    trHead.appendChild(thVacio);
+    const años = [...new Set(ramos.map((r) => r.año))].sort((a, b) => a - b);
 
-    años.forEach(año => {
-      const th = document.createElement("th");
-      th.textContent = `Año ${año}`;
-      trHead.appendChild(th);
-    });
-    tabla.appendChild(trHead);
+    años.forEach((año) => {
+      const columna = document.createElement("div");
+      columna.className = "columna-ano";
 
-    // Filas de semestres
-    semestres.forEach(sem => {
-      const tr = document.createElement("tr");
+      const titulo = document.createElement("h2");
+      titulo.textContent = `Año ${año}`;
+      columna.appendChild(titulo);
 
-      const thSem = document.createElement("th");
-      thSem.textContent = sem === 0 ? "Anual" : `Semestre ${sem}`;
-      tr.appendChild(thSem);
+      const anual = document.createElement("div");
+      anual.className = "fila-semestre";
+      const s1 = document.createElement("div");
+      s1.className = "fila-semestre";
+      const s2 = document.createElement("div");
+      s2.className = "fila-semestre";
 
-      años.forEach(año => {
-        const celda = crearCelda(año, sem);
-        tr.appendChild(celda);
-      });
+      ramos
+        .filter((r) => r.año === año)
+        .forEach((ramo) => {
+          const div = crearRamo(ramo);
+          const requisitosCumplidos = ramo.requisitos.every((req) => aprobados.has(req));
+          const estado = div.querySelector(".estado");
 
-      tabla.appendChild(tr);
+          if (aprobados.has(ramo.id)) {
+            div.classList.add("aprobado");
+            estado.textContent = "Aprobado";
+          } else if (!requisitosCumplidos) {
+            div.classList.add("bloqueado");
+            estado.textContent = "Bloqueado";
+          } else {
+            estado.textContent = "Disponible";
+          }
+
+          if (ramo.semestre === 1) s1.appendChild(div);
+          else if (ramo.semestre === 2) s2.appendChild(div);
+          else anual.appendChild(div);
+        });
+
+      if (anual.childNodes.length > 0) {
+        const label = document.createElement("h3");
+        label.textContent = "Anual";
+        columna.appendChild(label);
+        columna.appendChild(anual);
+      }
+      if (s1.childNodes.length > 0) {
+        const label = document.createElement("h3");
+        label.textContent = "Semestre 1";
+        columna.appendChild(label);
+        columna.appendChild(s1);
+      }
+      if (s2.childNodes.length > 0) {
+        const label = document.createElement("h3");
+        label.textContent = "Semestre 2";
+        columna.appendChild(label);
+        columna.appendChild(s2);
+      }
+
+      contenedor.appendChild(columna);
     });
   }
 
   render();
 });
-
