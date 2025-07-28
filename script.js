@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const ramos = [
-    // --- PRIMER AÑO ---
+    // PRIMER AÑO
     { id: "anatomia", nombre: "Anatomía humana normal y embriología", requisitos: [], año: 1, semestre: 1 },
     { id: "biologia", nombre: "Biología celular", requisitos: [], año: 1, semestre: 1 },
     { id: "fisica", nombre: "Física aplicada", requisitos: [], año: 1, semestre: 1 },
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "introduccion_clinica", nombre: "Introducción a la clínica", requisitos: ["introduccion"], año: 1, semestre: 2 },
     { id: "ingles1", nombre: "Inglés I", requisitos: [], año: 1, semestre: 2 },
 
-    // --- SEGUNDO AÑO ---
+    // SEGUNDO AÑO
     { id: "biomateriales", nombre: "Biomateriales", requisitos: ["fisica", "anatomia_aplicada", "quimica"], año: 2, semestre: 0 },
     { id: "bioquimica", nombre: "Bioquímica general", requisitos: ["quimica", "biologia"], año: 2, semestre: 3 },
     { id: "microbio_gral", nombre: "Microbiología general", requisitos: ["genetica"], año: 2, semestre: 3 },
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "promo_salud", nombre: "Promoción y educación en salud", requisitos: ["introduccion_clinica"], año: 2, semestre: 4 },
     { id: "raz_cientifico", nombre: "Razonamiento científico", requisitos: ["habilidades"], año: 2, semestre: 4 },
 
-    // --- TERCER AÑO ---
+    // TERCER AÑO
     { id: "pat_dentomax", nombre: "Patología dentomaxilar", requisitos: ["patologia2", "microbio_oral"], año: 3, semestre: 0 },
     { id: "imagenologia", nombre: "Imagenología", requisitos: ["patologia2"], año: 3, semestre: 0 },
     { id: "cirugia_bucal", nombre: "Cirugía bucal básica", requisitos: ["patologia2", "microbio_oral"], año: 3, semestre: 0 },
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "farmaco2", nombre: "Farmacología II", requisitos: ["farmaco1"], año: 3, semestre: 6 },
     { id: "cariologia", nombre: "Cariología", requisitos: ["microbio_oral", "farmaco1", "ingles4", "promo_salud"], año: 3, semestre: 6 },
 
-    // --- CUARTO AÑO ---
+    // CUARTO AÑO
     { id: "cirugia_dento", nombre: "Cirugía dentomaxilar", requisitos: ["farmaco2", "pat_dentomax", "imagenologia", "cirugia_bucal"], año: 4, semestre: 0 },
     { id: "odonto_rest", nombre: "Odontología restauradora", requisitos: ["imagenologia", "cirugia_bucal", "preclinico", "cariologia"], año: 4, semestre: 0 },
     { id: "protesis", nombre: "Prótesis dentomaxilar", requisitos: ["imagenologia", "cirugia_bucal", "fisio_oral", "preclinico"], año: 4, semestre: 0 },
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "pensamiento", nombre: "Pensamiento crítico", requisitos: ["raz_cientifico"], año: 4, semestre: 7 },
     { id: "salud_pub2", nombre: "Salud pública II", requisitos: ["salud_pub1"], año: 4, semestre: 8 },
 
-    // --- QUINTO AÑO ---
+    // QUINTO AÑO
     { id: "cirugia_trauma", nombre: "Cirugía y traumatología maxilofacial", requisitos: ["cirugia_dento", "pat_maxilo"], año: 5, semestre: 0 },
     { id: "cirugia_adulto", nombre: "Cirugía integral del adulto y odontogeriatría", requisitos: ["odonto_rest", "protesis", "endodoncia", "periodoncia"], año: 5, semestre: 0 },
     { id: "odontopediatria", nombre: "Odontopediatría", requisitos: ["cirugia_dento", "odonto_rest", "endodoncia"], año: 5, semestre: 0 },
@@ -69,91 +69,107 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "medicina_legal", nombre: "Medicina legal", requisitos: ["medicina_oral"], año: 5, semestre: 10 },
     { id: "resp_social", nombre: "Responsabilidad social", requisitos: [], año: 5, semestre: 10 },
 
-    // --- SEXTO AÑO ---
+    // SEXTO AÑO
     { id: "internado", nombre: "Internado clínico", requisitos: ["cirugia_trauma", "cirugia_adulto", "odontopediatria", "ortodoncia", "investigacion", "medicina_legal", "resp_social"], año: 6, semestre: 0 },
     { id: "proyecto", nombre: "Proyecto integrado de investigación", requisitos: ["cirugia_trauma", "cirugia_adulto", "odontopediatria", "ortodoncia", "investigacion", "medicina_legal", "resp_social"], año: 6, semestre: 0 },
   ];
 
+  // Guardar/leer aprobados de localStorage
   const aprobados = new Set(JSON.parse(localStorage.getItem("ramosAprobados") || "[]"));
 
   function guardarEstado() {
     localStorage.setItem("ramosAprobados", JSON.stringify(Array.from(aprobados)));
   }
 
-  function crearRamo(ramo) {
-    const div = document.createElement("div");
-    div.className = "ramo";
-    div.id = ramo.id;
-    div.textContent = ramo.nombre;
+  // Obtener años y semestres presentes
+  const años = [...new Set(ramos.map(r => r.año))].sort((a,b) => a - b);
 
-    const estado = document.createElement("span");
-    estado.className = "estado";
-    div.appendChild(estado);
+  // Para la tabla, vamos a ordenar semestres (incluyendo 0 como "Anual")
+  const semestresRaw = [...new Set(ramos.map(r => r.semestre))];
+  // Queremos semestres ordenados y con 0 al inicio:
+  const semestres = semestresRaw.filter(s => s !== 0).sort((a,b) => a-b);
+  if(semestresRaw.includes(0)) semestres.unshift(0);
 
-    div.addEventListener("click", () => {
-      if (!div.classList.contains("bloqueado")) {
-        if (aprobados.has(ramo.id)) {
-          aprobados.delete(ramo.id);
-        } else {
-          aprobados.add(ramo.id);
-        }
-        guardarEstado();
-        render();
+  // Crear celda con ramos (pueden ser varios por celda)
+  function crearCelda(año, semestre) {
+    const celda = document.createElement("td");
+    const ramosEnCelda = ramos.filter(r => r.año === año && r.semestre === semestre);
+
+    if(ramosEnCelda.length === 0) {
+      celda.textContent = "-";
+      celda.style.color = "#a6768e";
+      celda.style.fontStyle = "italic";
+      celda.style.cursor = "default";
+      return celda;
+    }
+
+    ramosEnCelda.forEach(ramo => {
+      const div = document.createElement("div");
+      div.className = "ramo";
+      div.textContent = ramo.nombre;
+      div.id = ramo.id;
+
+      const requisitosCumplidos = ramo.requisitos.every(req => aprobados.has(req));
+
+      if (aprobados.has(ramo.id)) {
+        div.classList.add("aprobado");
+        div.title = "Aprobado (clic para desaprobar)";
+      } else if (!requisitosCumplidos) {
+        div.classList.add("bloqueado");
+        div.title = "Bloqueado: no cumple requisitos";
+      } else {
+        div.title = "Disponible (clic para aprobar)";
       }
+
+      div.addEventListener("click", () => {
+        if (!div.classList.contains("bloqueado")) {
+          if (aprobados.has(ramo.id)) {
+            aprobados.delete(ramo.id);
+          } else {
+            aprobados.add(ramo.id);
+          }
+          guardarEstado();
+          render();
+        }
+      });
+
+      celda.appendChild(div);
     });
-    return div;
+
+    return celda;
   }
 
   function render() {
-    const contenedor = document.getElementById("malla");
-    contenedor.innerHTML = "";
+    const tabla = document.getElementById("malla");
+    tabla.innerHTML = "";
 
-    // Agrupar por año
-    const años = [...new Set(ramos.map(r => r.año))].sort((a,b) => a-b);
+    // Primera fila: cabecera años (con primera celda vacía para semestres)
+    const trHead = document.createElement("tr");
+    const thVacio = document.createElement("th");
+    thVacio.id = "titulo-semestres";
+    trHead.appendChild(thVacio);
 
     años.forEach(año => {
-      const contAño = document.createElement("div");
-      contAño.className = "año-container";
+      const th = document.createElement("th");
+      th.textContent = `Año ${año}`;
+      trHead.appendChild(th);
+    });
+    tabla.appendChild(trHead);
 
-      const tituloAño = document.createElement("h2");
-      tituloAño.textContent = `Año ${año}`;
-      contAño.appendChild(tituloAño);
+    // Filas de semestres
+    semestres.forEach(sem => {
+      const tr = document.createElement("tr");
 
-      // Semestres de ese año
-      const semestres = [...new Set(ramos.filter(r => r.año === año).map(r => r.semestre))].sort((a,b) => a-b);
+      const thSem = document.createElement("th");
+      thSem.textContent = sem === 0 ? "Anual" : `Semestre ${sem}`;
+      tr.appendChild(thSem);
 
-      semestres.forEach(sem => {
-        const contSemestre = document.createElement("div");
-        contSemestre.className = "semestre-container";
-
-        const tituloSem = document.createElement("h3");
-        tituloSem.textContent = sem === 0 ? "Anual" : `Semestre ${sem}`;
-        contSemestre.appendChild(tituloSem);
-
-        // Ramos del semestre
-        const ramosSem = ramos.filter(r => r.año === año && r.semestre === sem);
-        ramosSem.forEach(ramo => {
-          const div = crearRamo(ramo);
-          const requisitosCumplidos = ramo.requisitos.every(req => aprobados.has(req));
-          const estado = div.querySelector(".estado");
-
-          if (aprobados.has(ramo.id)) {
-            div.classList.add("aprobado");
-            estado.textContent = "Aprobado";
-          } else if (!requisitosCumplidos) {
-            div.classList.add("bloqueado");
-            estado.textContent = "Bloqueado";
-          } else {
-            estado.textContent = "Disponible";
-          }
-
-          contSemestre.appendChild(div);
-        });
-
-        contAño.appendChild(contSemestre);
+      años.forEach(año => {
+        const celda = crearCelda(año, sem);
+        tr.appendChild(celda);
       });
 
-      contenedor.appendChild(contAño);
+      tabla.appendChild(tr);
     });
   }
 
