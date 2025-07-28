@@ -3,98 +3,103 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 20px;
   color: #5a2a4d;
+  text-align: center;
 }
 
 h1 {
-  text-align: center;
   margin-bottom: 5px;
 }
 
 p {
-  text-align: center;
   margin-top: 0;
   margin-bottom: 20px;
   font-weight: 600;
   color: #7a3f67;
 }
 
-.contenedor-malla {
-  max-width: 1200px;
-  margin: 0 auto;
+#malla-container {
+  overflow-x: auto;
+  max-width: 100%;
 }
 
-/* Año container */
-.año-container {
-  margin-bottom: 40px;
-  border-bottom: 2px solid #e18ab8;
-  padding-bottom: 20px;
-}
-
-.año-container h2 {
-  color: #7a3f67;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-/* Semestre container */
-.semestre-container {
-  margin-bottom: 25px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: flex-start;
-}
-
-.semestre-container h3 {
+#malla {
+  border-collapse: collapse;
   width: 100%;
-  color: #a64f8f;
-  margin-bottom: 10px;
-  margin-left: 15px;
+  min-width: 900px;
+  table-layout: fixed;
 }
 
-/* Ramo boxes */
+#malla th, #malla td {
+  border: 2px solid #e18ab8;
+  padding: 10px;
+  vertical-align: top;
+  width: 140px;
+  max-width: 140px;
+  word-wrap: break-word;
+  color: #4b1f38;
+  font-weight: 700;
+  background-color: #f8cddf;
+  cursor: pointer;
+  border-radius: 8px;
+  position: relative;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+#malla th {
+  background-color: #f9bfd3;
+  color: #7a3f67;
+  cursor: default;
+  font-size: 1.1rem;
+}
+
+#titulo-semestres {
+  background-color: transparent;
+  border: none;
+  font-weight: 600;
+  color: #a64f8f;
+  cursor: default;
+  text-align: left;
+  padding-left: 20px;
+  width: 90px;
+}
+
 .ramo {
   background-color: #f8cddf;
-  border: 2px solid #e18ab8;
-  border-radius: 12px;
-  padding: 14px 20px;
-  width: 220px;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
   cursor: pointer;
-  box-shadow: 2px 2px 8px rgba(229, 156, 185, 0.7);
+  box-shadow: 1px 1px 6px rgba(229, 156, 185, 0.6);
   user-select: none;
-  transition: background-color 0.3s, border-color 0.3s;
-  position: relative;
   font-weight: 700;
   color: #4b1f38;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  margin-bottom: 6px;
 }
 
 .ramo:hover:not(.bloqueado) {
   background-color: #f9bfd3;
-  border-color: #d04f88;
+  box-shadow: 0 0 8px #d04f88;
 }
 
 .ramo.bloqueado {
   background-color: #f0d9e3;
-  border-color: #c89cb1;
   color: #a6768e;
   cursor: not-allowed;
   box-shadow: none;
+  opacity: 0.7;
 }
 
 .ramo.aprobado {
   background-color: #d87cae;
-  border-color: #aa4a79;
   color: #fff;
   box-shadow: 0 0 10px #d87cae;
 }
 
 .estado {
-  position: absolute;
-  bottom: 8px;
-  right: 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.7rem;
   font-style: italic;
   opacity: 0.8;
-  color: inherit;
+  margin-left: 4px;
 }
+
